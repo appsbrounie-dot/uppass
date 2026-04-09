@@ -1,3 +1,8 @@
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 import Stripe from 'stripe';
 import admin from 'firebase-admin';
 
