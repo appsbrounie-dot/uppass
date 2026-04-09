@@ -15,7 +15,7 @@ if (!admin.apps.length) {
 }
 
 export default async function handler(req, res) {
-  const event = req.body;
+  const event = {};
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
