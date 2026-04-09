@@ -7,9 +7,11 @@ export const config = {
 import Stripe from 'stripe';
 import admin from 'firebase-admin';
 
+// Inicializa Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Inicializar Firebase una sola vez
+// ⚠️ TEMPORAL: Firebase desactivado para evitar crash
+/*
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(
@@ -17,36 +19,11 @@ if (!admin.apps.length) {
     ),
   });
 }
+*/
 
 export default async function handler(req, res) {
   try {
-    // 🔥 Por ahora evitamos crash (luego metemos Stripe real)
-    const event = {};
-
-    // Si en el futuro viene evento real
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-
-      const email = session.customer_details?.email;
-      const product = session.metadata?.product;
-
-      let access = [];
-
-      if (product === 'CDMX') access = ['CDMX'];
-      if (product === 'MTY') access = ['MTY'];
-      if (product === 'GDL') access = ['GDL'];
-      if (product === 'FULL_MX') access = ['CDMX', 'MTY', 'GDL'];
-
-      if (email) {
-        await admin.firestore().collection('users').add({
-          email,
-          access,
-          createdAt: new Date().toISOString(),
-        });
-      }
-    }
-
-    // ✅ SIEMPRE RESPONDE
+    // ⚠️ TEMPORAL: solo responder OK para validar que todo funciona
     return res.status(200).json({ received: true });
 
   } catch (error) {
