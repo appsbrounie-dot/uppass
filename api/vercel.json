@@ -1,3 +1,12 @@
 {
-  "outputDirectory": "public"
+  "version": 2,
+  "builds": [
+    { "src": "api/webhook.js", "use": "@vercel/node" },
+    { "src": "dashboard.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/webhook", "dest": "/api/webhook.js" },
+    { "src": "/dashboard", "dest": "/dashboard.html" },
+    { "src": "/dashboard.html", "dest": "/dashboard.html" }
+  ]
 }
