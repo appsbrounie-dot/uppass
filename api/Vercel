@@ -1,0 +1,7 @@
+{
+  "routes": [
+    { "src": "/member-pass-area", "dest": "/dashboard.html" },
+    { "src": "/member-pass-area/(.*)", "dest": "/dashboard.html" },
+    { "src": "/api/webhook", "dest": "/api/webhook.js" }
+  ]
+}
