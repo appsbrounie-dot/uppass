@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>United Pitch Pass — My Pass</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--s1:#0e0d0b;--s2:#131210;
+  --gold:#c6a96b;--white:#f5f2ea;
+  --muted:rgba(245,242,234,0.62);--muted2:rgba(245,242,234,0.35);
+  --rust:#C4603A;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);
+}
+*{font-family:'Cormorant Garamond',serif!important}
+h1,h2,h3{font-family:'Playfair Display',serif!important}
+body{background:var(--bg);color:var(--white);min-height:100vh;
+  background-image:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(198,169,107,0.07) 0%,transparent 60%)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;transition:opacity .5s}
+.loading-screen.hidden{opacity:0;pointer-events:none}
+.loading-spinner{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--gold);animation:spin .8s linear infinite}
+
+.nav{display:none}
+
+.main{max-width:1100px;margin:0 auto;padding:64px 24px 100px}
+.dash-head{margin-bottom:56px;animation:fadeUp .7s both}
+.dash-eyebrow{font-size:9px!important;letter-spacing:3.5px;text-transform:uppercase;color:rgba(198,169,107,0.6);margin-bottom:12px;display:block}
+.dash-title{font-size:clamp(32px,4vw,48px)!important;margin-bottom:8px}
+.dash-sub{font-size:17px!important;color:var(--muted2)}
+
+.city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:48px}
+
+/* UNLOCKED */
+.city-card{
+  position:relative;border-radius:18px;overflow:hidden;
+  border:1px solid rgba(198,169,107,0.18);
+  animation:fadeUp .7s both;cursor:pointer;text-decoration:none;
+  transition:transform .35s,box-shadow .35s,border-color .3s;display:block;
+}
+.city-card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.6);border-color:rgba(198,169,107,0.35)}
+.city-img{height:200px;position:relative;overflow:hidden}
+.city-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(.75);transition:filter .5s,transform .6s;display:block}
+.city-card:hover .city-img img{filter:brightness(.32);transform:scale(1.04)}
+.city-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8) 0%,transparent 60%)}
+.city-body{padding:24px;background:var(--s1);border-top:1px solid rgba(198,169,107,0.1)}
+.city-code{font-size:9px!important;letter-spacing:2.5px;text-transform:uppercase;color:rgba(198,169,107,0.55);margin-bottom:6px;display:block}
+.city-name{font-size:22px!important;font-weight:700;color:var(--white);margin-bottom:6px}
+.city-stadium{font-size:12px!important;color:var(--muted2);margin-bottom:16px}
+.city-enter{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:100px;background:rgba(198,169,107,0.1);border:1px solid rgba(198,169,107,0.25);color:var(--gold);font-size:11px!important;letter-spacing:1.5px;text-transform:uppercase;transition:background .2s,border-color .2s}
+.city-card:hover .city-enter{background:rgba(198,169,107,0.2);border-color:rgba(198,169,107,0.5)}
+.unlocked-badge{position:absolute;top:14px;right:14px;padding:4px 12px;border-radius:100px;background:rgba(126,196,148,0.15);border:1px solid rgba(126,196,148,0.25);font-size:9px!important;letter-spacing:2px;text-transform:uppercase;color:rgba(126,196,148,0.85);z-index:2}
+
+/* LOCKED */
+.city-card-locked{border-radius:18px;overflow:hidden;border:1px solid var(--border);opacity:.5;filter:grayscale(.8)}
+.city-card-locked .city-img img{filter:brightness(.2) saturate(.1)}
+.city-card-locked .city-body{background:var(--s2)}
+.city-card-locked .city-name{color:var(--muted2)}
+.locked-badge{position:absolute;top:14px;right:14px;padding:4px 12px;border-radius:100px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);font-size:9px!important;letter-spacing:2px;text-transform:uppercase;color:rgba(245,242,234,0.3);z-index:2}
+.locked-buy{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:100px;border:1px solid var(--border);color:var(--muted2);font-size:11px!important;letter-spacing:1.5px;text-transform:uppercase;text-decoration:none}
+
+.upgrade-bar{background:var(--s1);border:1px solid rgba(198,169,107,0.18);border-radius:16px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
+.upgrade-bar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent)}
+.upgrade-label{font-size:9px!important;letter-spacing:3px;text-transform:uppercase;color:rgba(198,169,107,0.55);margin-bottom:8px;display:block}
+.upgrade-title{font-size:20px!important;font-weight:700;color:var(--white);margin-bottom:4px}
+.upgrade-sub{font-size:14px!important;color:var(--muted2)}
+.upgrade-cta{padding:12px 28px;border-radius:100px;border:1px solid rgba(198,169,107,0.35);color:var(--gold);font-size:11px!important;letter-spacing:2px;text-transform:uppercase;text-decoration:none;white-space:nowrap;transition:background .25s,border-color .25s}
+.upgrade-cta:hover{background:rgba(198,169,107,0.1);border-color:rgba(198,169,107,0.6)}
+
+.empty-box{text-align:center;padding:80px 24px;background:var(--s1);border:1px solid var(--border);border-radius:20px;grid-column:1/-1}
+.empty-title{font-size:26px!important;margin-bottom:12px}
+.empty-sub{font-size:16px!important;color:var(--muted2);margin-bottom:32px;line-height:1.6;max-width:400px;margin-left:auto;margin-right:auto}
+.empty-btn{display:inline-block;padding:14px 36px;border-radius:100px;background:var(--gold);color:#080808;text-decoration:none;font-size:11px!important;letter-spacing:2px;text-transform:uppercase;font-weight:700;transition:background .25s}
+.empty-btn:hover{background:#d4b87a}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-spinner"></div>
+</div>
+
+<div style="padding:12px 24px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:flex-end;gap:14px;background:rgba(8,8,8,0.5)">
+  <span style="font-size:13px;color:rgba(245,242,234,0.4)" id="navEmail"></span>
+  <button onclick="});
+});
+
+window.doLogout()" style="padding:7px 16px;border-radius:100px;border:1px solid rgba(255,255,255,0.1);background:none;color:rgba(245,242,234,0.4);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer">Sign Out</button>
+</div>
+
+<main class="main">
+  <div class="dash-head">
+    <span class="dash-eyebrow">Member Area &middot; World Cup 2026</span>
+    <h1 class="dash-title">Your Pass</h1>
+    <p class="dash-sub" id="dashSub">Loading your access&hellip;</p>
+  </div>
+  <div class="city-grid" id="cityGrid"></div>
+  <div id="upgradeWrap"></div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+
+var dashApp;
+try { dashApp = firebase.app('dashboard'); } catch(e) {
+  dashApp = firebase.initializeApp({
+    apiKey: "AIzaSyBJquOmoDHO3kGrhSynk-WEjNQRa5boACA",
+    authDomain: "uppass-8d509.firebaseapp.com",
+    projectId: "uppass-8d509",
+    storageBucket: "uppass-8d509.firebasestorage.app",
+    messagingSenderId: "598619053287",
+    appId: "1:598619053287:web:bf4b49e1c28d532f9c5642"
+  }, 'dashboard');
+}
+var auth = dashApp.auth();
+var db = dashApp.firestore();
+
+var CITIES = {
+  CDMX: {
+    name: 'Mexico City', code: 'MX · CDMX',
+    stadium: 'Estadio Azteca · Opening Match',
+    url: 'https://www.uppass.net/area-de-registros/',
+    img: 'https://b3bbd3f2a3.clvaw-cdnwnd.com/51541063b69a5d13311788fee5cbc121/200000095-c0282c0284/pexels-abner-velazquez-1035709527-34901887.webp?ph=b3bbd3f2a3',
+    stripe: 'https://buy.stripe.com/14AbJ39hwfdR7UD6zf0Ba0e'
+  },
+  GDL: {
+    name: 'Guadalajara', code: 'MX · GDL',
+    stadium: 'Estadio Akron · Group Stage',
+    url: 'https://www.uppass.net/guadalajara-member-area/',
+    img: 'https://b3bbd3f2a3.clvaw-cdnwnd.com/51541063b69a5d13311788fee5cbc121/200000107-21bfa21bfc/miguel-ramirez-wbdrpnbn_DE-unsplash.webp',
+    stripe: 'https://buy.stripe.com/eVq6oJeBQ6Hl6Qz0aR0Ba0g'
+  },
+  MTY: {
+    name: 'Monterrey', code: 'MX · MTY',
+    stadium: 'Estadio BBVA · Group Stage',
+    url: 'https://www.uppass.net/monterrey-member-area/',
+    img: 'https://b3bbd3f2a3.clvaw-cdnwnd.com/51541063b69a5d13311788fee5cbc121/200000115-d6053d6055/jesus-herrera-bxCAGIkEZXY-unsplash.webp',
+    stripe: 'https://buy.stripe.com/dRmcN765k2r5gr98Hn0Ba0f'
+  }
+};
+var ALL_CITY_KEYS = ['CDMX', 'GDL', 'MTY'];
+var FULL_STRIPE = 'https://buy.stripe.com/dRmeVf3Xc2r5gr93n30Ba0h';
+
+auth.onAuthStateChanged(function(user) {
+  if (!user) {
+    var a = document.createElement('a');
+    a.href = '/log-in-nuevo/';
+    document.body.appendChild(a);
+    a.click();
+    return;
+  }
+
+  document.getElementById('navEmail').textContent = user.email;
+
+  db.collection('users').doc(user.uid).get().then(function(userDoc) {
+    var access = userDoc.exists ? (userDoc.data().access || []) : [];
+
+    var grid = document.getElementById('cityGrid');
+    var sub = document.getElementById('dashSub');
+    var loading = document.getElementById('loadingScreen');
+    if (loading) loading.classList.add('hidden');
+
+    var unlocked = [];
+    var locked = [];
+    ALL_CITY_KEYS.forEach(function(k) {
+      if (access.indexOf(k) !== -1) unlocked.push(k);
+      else locked.push(k);
+    });
+
+    if (unlocked.length === 0) {
+      sub.textContent = 'No active passes found for this account.';
+      grid.innerHTML = '<div class="empty-box"><h2 class="empty-title">No passes found.</h2><p class="empty-sub">Purchase your city pass using this email address to unlock access.</p><a href="' + FULL_STRIPE + '" class="empty-btn">Get Full Mexico Access</a></div>';
+      return;
+    }
+
+    sub.textContent = unlocked.length === 3
+      ? 'You have full Mexico access — all 3 host cities unlocked.'
+      : unlocked.length + ' city pass' + (unlocked.length > 1 ? 'es' : '') + ' active.';
+
+    unlocked.forEach(function(key, i) {
+      var c = CITIES[key];
+      var card = document.createElement('a');
+      card.className = 'city-card';
+      card.href = c.url + '?access=' + key;
+      card.style.animationDelay = (i * 0.1) + 's';
+      card.innerHTML = '<div class="city-img"><img src="' + c.img + '" alt="' + c.name + '"><div class="city-img-overlay"></div><span class="unlocked-badge">&#10003; Unlocked</span></div><div class="city-body"><span class="city-code">' + c.code + '</span><div class="city-name">' + c.name + '</div><div class="city-stadium">' + c.stadium + '</div><div class="city-enter">Enter Pass <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div></div>';
+      grid.appendChild(card);
+    });
+
+    locked.forEach(function(key, i) {
+      var c = CITIES[key];
+      var card = document.createElement('div');
+      card.className = 'city-card-locked';
+      card.style.animationDelay = ((unlocked.length + i) * 0.1) + 's';
+      card.innerHTML = '<div class="city-img"><img src="' + c.img + '" alt="' + c.name + '"><div class="city-img-overlay"></div><span class="locked-badge">Locked</span></div><div class="city-body"><span class="city-code">' + c.code + '</span><div class="city-name">' + c.name + '</div><div class="city-stadium">' + c.stadium + '</div><a href="' + c.stripe + '" class="locked-buy">Unlock &mdash; $25 USD &rarr;</a></div>';
+      grid.appendChild(card);
+    });
+
+    if (locked.length > 0) {
+      document.getElementById('upgradeWrap').innerHTML = '<div class="upgrade-bar"><div><span class="upgrade-label">Upgrade</span><div class="upgrade-title">Get Full Mexico Access</div><p class="upgrade-sub">Unlock all 3 cities for $50 USD &mdash; save $25 vs buying separately.</p></div><a href="' + FULL_STRIPE + '" class="upgrade-cta">Full Mexico &mdash; $50 USD &rarr;</a></div>';
+    }
+  }).catch(function(err) {
+    console.error('Firestore error:', err);
+  });
+});
+
+self.doLogout = function() {
+  auth.signOut().then(function() {
+    var a = document.createElement('a');
+    a.href = '/log-in-nuevo/';
+    document.body.appendChild(a);
+    a.click();
+  });
+};
+</script>
+</body>
+</html>
